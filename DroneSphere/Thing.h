@@ -14,5 +14,6 @@ public:
 
 public:
 	string m_stName;
+	string m_stAlias;
 };
 

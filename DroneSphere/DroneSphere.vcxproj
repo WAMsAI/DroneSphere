@@ -80,6 +80,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Tools\DynamicArray.cpp" />
+    <ClCompile Include="Action.cpp" />
     <ClCompile Include="Building.cpp" />
     <ClCompile Include="Cells.cpp" />
     <ClCompile Include="Gamer.cpp" />
@@ -93,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Tools\DynamicArray.h" />
+    <ClInclude Include="Action.h" />
     <ClInclude Include="Building.h" />
     <ClInclude Include="Cells.h" />
     <ClInclude Include="Gamer.h" />

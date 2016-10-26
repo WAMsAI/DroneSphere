@@ -22,6 +22,12 @@
     <Filter Include="头文件\Things">
       <UniqueIdentifier>{23fb2542-5488-47c5-92c5-42e8095537f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\Action">
+      <UniqueIdentifier>{16a177d9-f346-407d-9ffd-7e3c04b428d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Action">
+      <UniqueIdentifier>{74e84f6d-dca3-4e09-b7e0-bdb04c2df13a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -57,6 +63,9 @@
     <ClCompile Include="Thing.cpp">
       <Filter>源文件\Things</Filter>
     </ClCompile>
+    <ClCompile Include="Action.cpp">
+      <Filter>源文件\Action</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="World.h">
@@ -88,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="Thing.h">
       <Filter>头文件\Things</Filter>
+    </ClInclude>
+    <ClInclude Include="Action.h">
+      <Filter>头文件\Action</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

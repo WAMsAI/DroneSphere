@@ -4,7 +4,7 @@
 
 void Thing_Test()
 {
-
+	cout << "  Thing_Test();" << endl;
 }
 
 
@@ -13,6 +13,7 @@ void Thing_Test()
 Thing::Thing()
 {
 	m_stName = "";
+	m_stAlias = "";
 }
 Thing::~Thing()
 {
