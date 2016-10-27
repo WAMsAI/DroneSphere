@@ -11,8 +11,11 @@ Describe:
 #include <fstream>
 #include <iomanip>
 
-#include "DynamicArray.h"
 
+#include "DynamicArray.h"
+#include "MultithreadManager.h"
+#include "HighPrecisionTimer.h"
+#include "ColorCout.h"
 
 using namespace std;
 int main()
@@ -20,12 +23,20 @@ int main()
 	cout << "----- START -----------------------------------------------------" << endl;
 
 	// TODO:
-	C2DDynamicArray_Test();
+	//C2DDynamicArray_Test();
+	
+	MultithreadManager_Test();
+	//MultithreadManager_Learn_0_Test();
+	//MultithreadManager_Learn_1_Test();
 
-	C2DDynamicArray<int> * twoDA = new C2DDynamicArray<int>(2, 3);
+	//ThreadMTM_Test();
 
+	//ResourceLock_Test();
+	//ActionSignal_Test();
 
-	delete twoDA;
+	//HighPrecisionTimer_Test();
+
+	//ColorCout_Test();
 
 	cout << "-----  END  -----------------------------------------------------" << endl;
 	return 0;

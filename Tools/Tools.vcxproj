@@ -76,11 +76,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ColorCout.cpp" />
     <ClCompile Include="DynamicArray.cpp" />
+    <ClCompile Include="HighPrecisionTimer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MultithreadManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ColorCout.h" />
     <ClInclude Include="DynamicArray.h" />
+    <ClInclude Include="HighPrecisionTimer.h" />
+    <ClInclude Include="MultithreadManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -21,9 +21,27 @@
     <ClCompile Include="DynamicArray.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="MultithreadManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighPrecisionTimer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorCout.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DynamicArray.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MultithreadManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighPrecisionTimer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorCout.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
