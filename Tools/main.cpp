@@ -25,7 +25,7 @@ int main()
 	// TODO:
 	//C2DDynamicArray_Test();
 	
-	MultithreadManager_Test();
+	//MultithreadManager_Test();
 	//MultithreadManager_Learn_0_Test();
 	//MultithreadManager_Learn_1_Test();
 
@@ -34,7 +34,7 @@ int main()
 	//ResourceLock_Test();
 	//ActionSignal_Test();
 
-	//HighPrecisionTimer_Test();
+	HighPrecisionTimer_Test();
 
 	//ColorCout_Test();
 

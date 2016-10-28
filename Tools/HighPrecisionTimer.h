@@ -10,6 +10,8 @@ Describe:
 #include <string>
 #include <iomanip>
 
+#include <windows.h>
+
 
 using namespace std;
 
@@ -20,5 +22,24 @@ class HighPrecisionTimer
 public:
 	HighPrecisionTimer();
 	~HighPrecisionTimer();
+
+public:
+	void Init();
+	void Clock_Start();
+	void Clock_End();
+	double Clock_Endex();
+
+	double GetTimeLag(); // Return : Millisecond
+
+	bool IsAvailable();
+private:
+	LARGE_INTEGER m_llFreque;
+
+	double m_dFF;
+	double m_dFM;
+	double m_dFT;
+
+	long long m_llQT1;
+	long long m_llQT2;
 };
 
