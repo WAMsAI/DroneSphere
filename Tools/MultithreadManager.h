@@ -16,11 +16,13 @@ Describe:
 #include <process.h>
 
 #include "ColorCout.h"
+#include "HighPrecisionTimer.h"
 
 using namespace std;
 
 class ThreadMTM;
 class ResourceLock;
+class ActionSignal;
 class MultithreadManager;
 
 
@@ -31,11 +33,15 @@ void MultithreadManager_Test();
 class MultithreadManager
 {
 public:
-	MultithreadManager(int SharedResSize);
+	MultithreadManager(int SharedResSize, int SyncSignalSize);
 	~MultithreadManager();
 
 	int GetThreadSize();
 	int GetSharedResSize();
+
+	ResourceLock * GetResourceLockArray();
+	ActionSignal * GetSyncSignal();
+	ThreadMTM * GetThreadMTM(int index);
 	
 	void AddThread(ThreadMTM * pThreadMTM);
 	void RemoveThread(ThreadMTM * pThreadMTM);
@@ -49,6 +55,9 @@ private:
 	int m_iSharedResourceSize;
 	ResourceLock * m_arResourceLock;
 
+	int m_iSynchronousSignalSize;
+	ActionSignal * m_arSyncSignal;
+
 	int m_iThreadSize;
 	list<ThreadMTM *> m_liThreadMTM;
 };
@@ -59,7 +68,7 @@ class ThreadMTM
 {
 public:
 	ThreadMTM(bool bIsSuspend);
-	~ThreadMTM();
+	virtual ~ThreadMTM();
 
 	bool StartThread();
 	bool PauseThread();
@@ -88,7 +97,7 @@ private:
 	void EndThreadInRunFunc();
 
 
-private:
+protected:
 	HANDLE m_hThread;
 	bool   m_bIsStopped;
 	unsigned int m_uiId;
@@ -120,9 +129,13 @@ void ActionSignal_Test();
 class ActionSignal
 {
 public:
+	ActionSignal();
 	ActionSignal(long lInitCount, long lMaxCount, LPCWSTR name);
 	ActionSignal(LPCWSTR openName, bool * pIsOk);
 	~ActionSignal();
+
+	void Init(long lInitCount, long lMaxCount, LPCWSTR name);
+	bool Init(LPCWSTR openName);
 
 	LPCWSTR GetName();
 	long GetInitCount();
@@ -130,7 +143,9 @@ public:
 	
 	bool WaitActionSignal();
 	bool WaitZeroActionSignal();
+	bool ReleaseThisActionSignal(long i);
 	bool ReleaseActionSignal(ActionSignal * pActionSignal, long i);
+
 
 private:
 	HANDLE GetSemaphore();
@@ -140,6 +155,30 @@ private:
 	LPCWSTR m_lpName;
 	long m_lInitCount;
 	long m_lMaxCount;
+};
+
+
+// ---------------------------------------------------------
+// How to use ThreadMTM.
+void WorkerThreadMTM_Test();
+class WorkerThreadMTM : public ThreadMTM
+{
+public:
+	WorkerThreadMTM(ResourceLock * arRL, ActionSignal * arAS, bool bIsSuspend);
+	~WorkerThreadMTM();
+
+	virtual void Run() override;
+
+public:
+	HighPrecisionTimer * m_pHPT;
+
+private:
+	ResourceLock * m_arRL;
+	ActionSignal * m_arAS;
+	int m_iNumber; // Start from 1 go to N
+
+private:
+	static int sm_iThreadCount;
 };
 
 

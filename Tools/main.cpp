@@ -34,9 +34,13 @@ int main()
 	//ResourceLock_Test();
 	//ActionSignal_Test();
 
-	HighPrecisionTimer_Test();
+	WorkerThreadMTM_Test();
+
+	//HighPrecisionTimer_Test();
 
 	//ColorCout_Test();
+
+
 
 	cout << "-----  END  -----------------------------------------------------" << endl;
 	return 0;

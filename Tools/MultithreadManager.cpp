@@ -3,46 +3,42 @@
 
 
 // ---------------------------------------------------------
-const int END_PRODUCE_NUMBER = 10;   // 生产产品个数  
-int g_Buffer;                        // 缓冲区  
+const int END_PRODUCE_NUMBER = 10;   
+int g_Buffer;                       
 
-// 事件与关键段  
+// CriticalSection and Event
 CRITICAL_SECTION g_cs;
 HANDLE g_hEventBufferEmpty, g_hEventBufferFull;
 
-// 生产者线程函数  
+// Producer Thread Fun 
 unsigned int __stdcall ProducerThreadFun(PVOID pM)
 {
 	for (int i = 1; i <= END_PRODUCE_NUMBER; i++)
 	{
-		//等待缓冲区为空  
 		WaitForSingleObject(g_hEventBufferEmpty, INFINITE);
 
-		//互斥的访问缓冲区  
 		EnterCriticalSection(&g_cs);
 		g_Buffer = i;
-		cout << redcolor << "  生产者将数据 [" << i << "] 放入缓冲区"  << defcolor << endl;
+		cout << redcolor << "  Producer put [" << i << "] in buffer"  << defcolor << endl;
 		LeaveCriticalSection(&g_cs);
 
-		//通知缓冲区有新数据了  
+		
 		SetEvent(g_hEventBufferFull);
 	}
 	return 0;
 }
 
-// 消费者线程函数  
+// Consumer Thread Fun
 unsigned int __stdcall ConsumerThreadFun(PVOID pM)
 {
 	volatile bool flag = true;
 	while (flag)
 	{
-		// 等待缓冲区中有数据  
 		WaitForSingleObject(g_hEventBufferFull, INFINITE);
 
-		// 互斥的访问缓冲区  
 		EnterCriticalSection(&g_cs);
 		
-		cout << greencolor << "    消费者从缓冲区中取数据：" << g_Buffer << defcolor << endl;
+		cout << greencolor << "    Consumer get data from " << g_Buffer << defcolor << endl;
 		
 		if (g_Buffer == END_PRODUCE_NUMBER)
 		{
@@ -51,7 +47,6 @@ unsigned int __stdcall ConsumerThreadFun(PVOID pM)
 
 		LeaveCriticalSection(&g_cs);
 
-		// 通知缓冲区已为空  
 		SetEvent(g_hEventBufferEmpty);
 
 		Sleep(10); // some other work should to do  
@@ -63,14 +58,14 @@ void MultithreadManager_Learn_0_Test()
 {
 	cout << "  MultithreadManager_Learn_0_Test();" << endl << endl;
 
-	// 1生产者 1消费者 1缓冲区  
-	// 使用二个事件，一个表示缓冲区空，一个表示缓冲区满。  
-	// 再使用一个关键段来控制缓冲区的访问  
-	cout << "  生产者消费者问题   1生产者 1消费者 1缓冲区" << endl << endl;
+	// 1 Producer, 1 Consumer, 1 Buffer.  
+	// Use two Event, one represented  Buffer is empty,  one represented Buffer is full. 
+	// Then use CriticalSection to control Buffer visit.
+	cout << "  Producer and Consumer problem:   1 Producer, 1 Consumer, 1 Buffer." << endl << endl;
 
 	InitializeCriticalSection(&g_cs);
 	
-	// 创建二个自动复位事件，一个表示缓冲区是否为空，另一个表示缓冲区是否已经处理  
+	// Create two auto-reset events.
 	g_hEventBufferEmpty = CreateEvent(NULL, FALSE, TRUE, NULL);
 	g_hEventBufferFull = CreateEvent(NULL, FALSE, FALSE, NULL);
 
@@ -84,7 +79,7 @@ void MultithreadManager_Learn_0_Test()
 	CloseHandle(hThread[0]);
 	CloseHandle(hThread[1]);
 
-	// 销毁事件和关键段  
+	// delete 
 	CloseHandle(g_hEventBufferEmpty);
 	CloseHandle(g_hEventBufferFull);
 	DeleteCriticalSection(&g_cs);
@@ -106,23 +101,26 @@ void MultithreadManager_Learn_1_Test()
 void MultithreadManager_Test()
 {
 	cout << "  MultithreadManager_Test();" << endl << endl;
-	MultithreadManager * pMTM = new MultithreadManager(12);
+	MultithreadManager * pMTM = new MultithreadManager(12, 3);
 
-	pMTM->AddThread(new ThreadMTM(false));
-	pMTM->AddThread(new ThreadMTM(false));
+	//pMTM->AddThread(new ThreadMTM(false));
+	//pMTM->AddThread(new ThreadMTM(false));
 
 
 	cout << pMTM->WaitForAllThread() << endl;
 
-	//delete pMTM;
+	delete pMTM;
 }
 
-MultithreadManager::MultithreadManager(int SharedResSize)
+MultithreadManager::MultithreadManager(int SharedResSize, int SyncSignalSize)
 {
 	m_iThreadSize = 0;
 	m_iSharedResourceSize = SharedResSize;
+	m_iSynchronousSignalSize = SyncSignalSize;
 
 	m_arResourceLock = new ResourceLock[SharedResSize];
+	m_arSyncSignal = new ActionSignal[SyncSignalSize];
+
 }
 MultithreadManager::~MultithreadManager()
 {
@@ -137,6 +135,9 @@ MultithreadManager::~MultithreadManager()
 		delete tMTM;
 		m_liThreadMTM.pop_back();
 	}
+
+	delete[] m_arResourceLock;
+	delete[] m_arSyncSignal;
 }
 
 
@@ -150,6 +151,33 @@ int MultithreadManager::GetSharedResSize()
 	return m_iSharedResourceSize;
 }
 
+
+ResourceLock * MultithreadManager::GetResourceLockArray()
+{
+	return m_arResourceLock;
+}
+ActionSignal * MultithreadManager::GetSyncSignal()
+{
+	return m_arSyncSignal;
+}
+
+ThreadMTM * MultithreadManager::GetThreadMTM(int index)
+{
+	list<ThreadMTM *>::iterator v = m_liThreadMTM.begin();
+	
+	int i = 0;
+	while (m_liThreadMTM.end() != v)
+	{
+		if (i == index)
+		{
+			return *v;
+		}
+
+		i++;
+		v++;
+	}
+	return NULL;
+}
 
 void MultithreadManager::AddThread(ThreadMTM * pThreadMTM)
 {
@@ -250,6 +278,7 @@ ThreadMTM::~ThreadMTM()
 		EndThread();
 		CloseHandle(m_hThread);
 	}
+	//cout << "~ThreadMTM()" << endl;
 }
 
 
@@ -415,6 +444,7 @@ ResourceLock::ResourceLock(LPCWSTR openName, bool * pIsOk)
 
 ResourceLock::~ResourceLock()
 {
+	//cout << "~ResourceLock();" << endl;
 	if (NULL != m_hMutex)
 	{
 		CloseHandle(m_hMutex);
@@ -486,6 +516,13 @@ void ActionSignal_Test()
 	delete pAS;
 }
 
+ActionSignal::ActionSignal()
+{
+	m_lInitCount = 0;
+	m_lMaxCount = 0;
+	m_lpName = NULL;
+	m_hSemaphore = NULL;
+}
 ActionSignal::ActionSignal(long lInitCount, long lMaxCount, LPCWSTR name)
 {
 	m_lInitCount = lInitCount;
@@ -522,6 +559,27 @@ ActionSignal::~ActionSignal()
 }
 
 
+void ActionSignal::Init(long lInitCount, long lMaxCount, LPCWSTR name)
+{
+	m_hSemaphore = CreateSemaphore(NULL, lInitCount, lMaxCount, name);
+}
+bool ActionSignal::Init(LPCWSTR openName)
+{
+	m_lpName = openName;
+	m_hSemaphore = OpenSemaphore(SEMAPHORE_ALL_ACCESS, TRUE, openName);
+	m_lInitCount = -1;
+	m_lMaxCount = -1;
+
+	if (NULL == m_hSemaphore)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
 LPCWSTR ActionSignal::GetName()
 {
 	return m_lpName;
@@ -552,6 +610,21 @@ bool ActionSignal::WaitZeroActionSignal()
 	}
 	return false;
 }
+
+bool ActionSignal::ReleaseThisActionSignal(long i)
+{
+	BOOL bhere = ReleaseSemaphore(this->GetSemaphore(), i, NULL);
+	if (FALSE == bhere)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+
+	return false;
+}
 bool ActionSignal::ReleaseActionSignal(ActionSignal * pActionSignal, long i)
 {
 	if (NULL != pActionSignal)
@@ -573,3 +646,92 @@ HANDLE ActionSignal::GetSemaphore()
 {
 	return m_hSemaphore;
 }
+
+
+// ---------------------------------------------------------
+void WorkerThreadMTM_Test()
+{
+	cout << "  WorkerThreadMTM_Test();" << endl << endl;
+	MultithreadManager * pMTM = new MultithreadManager(12, 3);
+	ResourceLock * arRL = pMTM->GetResourceLockArray();
+	ActionSignal * arAS = pMTM->GetSyncSignal();
+
+
+
+	cout << greencolor;
+
+	pMTM->AddThread(new WorkerThreadMTM(arRL, arAS, true));
+	pMTM->AddThread(new WorkerThreadMTM(arRL, arAS, true));
+
+	arAS[1].Init(0, 1, NULL);
+	arAS[2].Init(0, 1, NULL);
+
+
+	WorkerThreadMTM * pWT0 = (WorkerThreadMTM *)pMTM->GetThreadMTM(0);
+	WorkerThreadMTM * pWT1 = (WorkerThreadMTM *)pMTM->GetThreadMTM(1);
+
+	bool t1 = false;
+	bool t2 = false;
+
+	//bool t1 = arRL[1].TryLock();
+	//bool t2 = arRL[2].TryLock();
+
+	pWT0->StartThread();
+	pWT1->StartThread();
+
+	t1 = arAS[1].WaitActionSignal();
+	t2 = arAS[2].WaitActionSignal();
+
+	printf_s("AS:%d GET:%d\n", 1, t1);
+	printf_s("AS:%d GET:%d\n", 2, t2);
+
+	cout << "N1 Time:" << pWT0->m_pHPT->GetTimeLag() << endl;
+	cout << "N2 Time:" << pWT1->m_pHPT->GetTimeLag() << endl;
+
+
+	//printf_s("RL:%d Lock:%d\n", 1, t1);
+	//printf_s("RL:%d Lock:%d\n", 2, t2);
+
+	cout << endl << "ThreadIsEnd:" << pMTM->WaitForAllThread() << endl;
+	
+	cout << defcolor;
+
+	delete pMTM;
+}
+
+WorkerThreadMTM::WorkerThreadMTM(ResourceLock * arRL, ActionSignal * arAS, bool bIsSuspend) :ThreadMTM(bIsSuspend)
+{
+	m_arRL = arRL;
+	m_arAS = arAS;
+	sm_iThreadCount++;
+	m_iNumber = sm_iThreadCount;
+
+	m_pHPT = new HighPrecisionTimer();
+}
+WorkerThreadMTM::~WorkerThreadMTM()
+{
+	delete m_pHPT;
+	//cout << "~WorkerThreadMTM()" << endl;
+}
+void WorkerThreadMTM::Run()
+{
+	m_arRL[m_iNumber].Lock();
+	
+	srand((unsigned)time(NULL));
+	int x = rand() * m_iNumber;
+	printf_s("ThreadID:%d Number:%d Rand:%d\n", m_uiId, m_iNumber, x);
+
+	m_pHPT->Clock_Start();
+	
+	// Todo:
+	Sleep(500 * (x % 10)); // Run time
+
+	m_pHPT->Clock_End();
+
+	m_arRL[m_iNumber].Unlock();
+
+
+	m_arAS[m_iNumber].ReleaseThisActionSignal(1);
+}
+
+int WorkerThreadMTM::sm_iThreadCount = 0;

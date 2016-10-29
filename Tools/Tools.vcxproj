@@ -81,12 +81,14 @@
     <ClCompile Include="HighPrecisionTimer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MultithreadManager.cpp" />
+    <ClCompile Include="Randomizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ColorCout.h" />
     <ClInclude Include="DynamicArray.h" />
     <ClInclude Include="HighPrecisionTimer.h" />
     <ClInclude Include="MultithreadManager.h" />
+    <ClInclude Include="Randomizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
