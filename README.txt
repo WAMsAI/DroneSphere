@@ -6,6 +6,5 @@ Email:         377253608@qq.com
 Describe:
 */
 
-This is a game, like Screeps¡¢Sid Meiers Civilization.
-I hope I can finish the game
-.
+This is a game, like Screeps, Sid Meiers Civilization.
+I hope I can finish the game.

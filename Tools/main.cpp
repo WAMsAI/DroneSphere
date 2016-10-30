@@ -34,7 +34,7 @@ int main()
 	//ResourceLock_Test();
 	//ActionSignal_Test();
 
-	WorkerThreadMTM_Test();
+	//WorkerThreadMTM_Test();
 
 	//HighPrecisionTimer_Test();
 
