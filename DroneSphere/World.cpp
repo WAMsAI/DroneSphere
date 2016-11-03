@@ -7,25 +7,26 @@ void World_Test()
 {
 	cout << "  World_Test();" << endl;
 	
-	// 创建世界
+	// Create and Set world
 	World world = World();
-	//SimpleOpeningWorldTemplate sOWT = SimpleOpeningWorldTemplate(6, 5);
-	//world.SetWorld(&sOWT);
+	SimpleOpeningWorldTemplate sOWT = SimpleOpeningWorldTemplate(6, 5);
+	world.SetWorld(&sOWT);
 	
-	// 创建并添加玩家
-	Gamer gamer = Gamer();
-	gamer.m_sName = "Hello, World!";
-	world.m_vGamerList.push_front(&gamer);
+	// Create and Add gamer
+	Gamer * pGamer = new Gamer();
+	pGamer->m_sName = "Hello, World!";
+	world.AddGamer(pGamer);
 
 
-	Cells ** pCells = world.m_arCells;
 
 
-	// 输出测试
+
+	// Print info
+	Cells ** pCells = world.GetArrayCells();
 	PrintWorldInfo(&world);
-	for (int h = 0; h < world.m_iHeight; h++)
+	for (int h = 0; h < world.GetWorldHeight(); h++)
 	{
-		for (int w = 0; w < world.m_iWidth; w++)
+		for (int w = 0; w < world.GetWorldWidth(); w++)
 		{
 			cout << "[" << setw(2) << pCells[w][h].m_iX << ",";
 			cout << setw(2) << pCells[w][h].m_iY << "]  ";
@@ -33,18 +34,13 @@ void World_Test()
 		cout << endl;
 	}
 
-
-
-
-	//Gamer * gamer2 = world.m_vGamerList.front();
-	//cout << gamer2->m_sName << endl;
 }
 void PrintWorldInfo(World * pWorld)
 {
 	cout << "WorldInfo--------------------------" << endl;
-	cout << "  m_iWidth : " << pWorld->m_iWidth << endl;
-	cout << "  m_iHeight: " << pWorld->m_iHeight << endl;
-	cout << "  GamerCount:" << pWorld->m_vGamerList.size() << endl;
+	cout << "  m_iWidth : " << pWorld->GetWorldWidth() << endl;
+	cout << "  m_iHeight: " << pWorld->GetWorldHeight() << endl;
+	cout << "  GamerCount:" << pWorld->GetGamerSize() << endl;
 	cout << "End WorldInfo----------------------" << endl;
 }
 
@@ -58,6 +54,8 @@ World::World()
 	m_iHeight = 0;
 	m_arCells = NULL;
 	m_arAllCells = NULL;
+
+	m_iEveryRoundTime = 0;
 }
 World::~World()
 {
@@ -65,19 +63,64 @@ World::~World()
 	{
 		delete pC2DDA;
 	}
+
+	while ( !m_vGamerList.empty() )
+	{
+		Gamer * pGamer = m_vGamerList.back();
+		delete pGamer;
+		m_vGamerList.pop_back();
+	}
 }
 
+Gamer * World::GetGamer(int index)
+{
+	list<Gamer *>::iterator v = m_vGamerList.begin();
+
+	int i = 0;
+	while (m_vGamerList.end() != v)
+	{
+		if (i == index)
+		{
+			return *v;
+		}
+
+		i++;
+		v++;
+	}
+	return NULL;
+}
+int World::GetGamerSize()
+{
+	return m_vGamerList.size();
+}
 bool World::AddGamer(Gamer * pGamer)
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	m_vGamerList.push_back(pGamer);
+	return true;
+}
+bool World::RemoveGamer(Gamer * pGamer)
+{
+	m_vGamerList.remove(pGamer);
+	return true;
+}
+bool World::DeleteGamer(Gamer * pGamer)
+{
+	m_vGamerList.remove(pGamer);
+	delete pGamer;
+
+	return true;
 }
 
-bool World::RemoveGamer(Gamer * pGamer)
+
+void World::StartWorld()
 {
 	throw std::logic_error("The method or operation is not implemented.");
 }
-
-bool World::DeleteGamer(Gamer * pGamer)
+void World::PauseWorld()
+{
+	throw std::logic_error("The method or operation is not implemented.");
+}
+void World::EndWorld()
 {
 	throw std::logic_error("The method or operation is not implemented.");
 }
@@ -150,14 +193,31 @@ void World::SetWorld(WorldTemplate * pWorldTemplate)
 	pWorldTemplate->SetWorld(this);
 }
 
+void World::SetEveryRoundTime(int ms)
+{
+	m_iEveryRoundTime = ms;
+}
+int  World::GetEveryRoundTime()
+{
+	return m_iEveryRoundTime;
+}
+
 int World::GetWorldWidth()
 {
 	return m_iWidth;
 }
-
 int World::GetWorldHeight()
 {
 	return m_iHeight;
+}
+
+Cells ** World::GetArrayCells()
+{
+	return m_arCells;
+}
+Cells * World::GetAllCells()
+{
+	return m_arAllCells;
 }
 
 
@@ -349,6 +409,14 @@ void World::SetLRLine()
 
 
 
+
+
+
+
+
+
+
+
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 WorldTemplate::WorldTemplate(int width, int height)
@@ -388,7 +456,5 @@ SimpleOpeningWorldTemplate::~SimpleOpeningWorldTemplate()
 
 void SimpleOpeningWorldTemplate::SetWorld(World * pWorld)
 {
-	
-
-
+	pWorld->SetEveryRoundTime(50);
 }

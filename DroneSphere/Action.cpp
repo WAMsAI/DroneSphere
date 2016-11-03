@@ -1,21 +1,30 @@
 #include "Action.h"
 
-list<Action> Action::m_liActionList;
-list<Action> Action::m_liAutoActionList;
+
 
 
 void Action_Test()
 {
 	cout << "  Action_Test();" << endl;
-	Action action = Action();
-	cout << "    ActionListSize:" << Action::GetSize_ActionList() << endl;
-	cout << "    AutoActionListSize:" << Action::GetSize_ActionList() << endl;
+	Action * pAction = new Action();
+	ActionList pAList = ActionList();
 
-	Action::AddAction(action);
-	Action::AddAutoAction(action);
+	pAList.AddAction(pAction);
 
+	Action * temp;
+	temp = pAList.GetFirstAction();
+	if (temp == pAction)
+	{
+		cout << "yes" << endl;
+	}
+
+	temp->TakeAction();
+
+	
+	delete pAction;
 }
 
+//------------------------------------------------------------------
 Action::Action()
 {
 
@@ -43,20 +52,55 @@ void Action::TakeAction()
 
 }
 
-int Action::GetSize_ActionList()
+
+
+//------------------------------------------------------------------
+ActionList::ActionList()
+{
+
+}
+ActionList::~ActionList()
+{
+}
+
+void ActionList::TakeAction(Action * pAction)
+{
+	pAction->TakeAction();
+}
+
+Action * ActionList::GetFirstAction()
+{
+	return m_liActionList.front();
+}
+void ActionList::RemoveFirstAction()
+{
+	m_liActionList.pop_front();
+}
+Action * ActionList::GetFirstAutoAction()
+{
+	return m_liAutoActionList.front();
+}
+void ActionList::RemoveFirstAutoAction()
+{
+	m_liAutoActionList.pop_front();
+}
+
+void ActionList::AddAction(Action * pAction)
+{
+	m_liActionList.push_back(pAction);
+}
+void ActionList::AddAutoAction(Action * pAction)
+{
+	m_liAutoActionList.push_back(pAction);
+}
+
+int ActionList::GetSize_ActionList()
 {
 	return m_liActionList.size();
 }
-int Action::GetSize_AutoActionList()
+int ActionList::GetSize_AutoActionList()
 {
 	return m_liAutoActionList.size();
 }
 
-void Action::AddAction(Action action)
-{
-	m_liActionList.push_back(action);
-}
-void Action::AddAutoAction(Action action)
-{
-	m_liAutoActionList.push_back(action);
-}
+

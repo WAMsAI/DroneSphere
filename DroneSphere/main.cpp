@@ -25,13 +25,13 @@ int main()
 	cout << "----- START -----------------------------------------------------" << endl;
 
 	// TODO:
-	//World_Test();
+	World_Test();
 
 	//Gamer_Test();
 
 	//Units_Test();
 
-	Action_Test();
+	//Action_Test();
 
 	cout << "-----  END  -----------------------------------------------------" << endl;
 	return 0;
